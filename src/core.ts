@@ -1,4 +1,4 @@
-// Sundial core: an immutable, timezone-aware instant.
+// Jefflag core: an immutable, timezone-aware instant.
 // Everything is stored as UTC epoch milliseconds plus an IANA zone id;
 // all wall-clock math is resolved through Intl so DST is handled by the platform.
 
@@ -77,22 +77,22 @@ export function wallToEpoch(parts: Parts, zone: Zone): number {
   return o2 === o1 ? adjusted : guess - o2 * MS.minute;
 }
 
-export class SundialDate {
+export class JefflagDate {
   private constructor(
     readonly epochMs: number,
     readonly zone: Zone,
   ) {}
 
-  static fromEpoch(epochMs: number, zone: Zone = "UTC"): SundialDate {
-    return new SundialDate(epochMs, zone);
+  static fromEpoch(epochMs: number, zone: Zone = "UTC"): JefflagDate {
+    return new JefflagDate(epochMs, zone);
   }
 
-  static fromParts(parts: Parts, zone: Zone = "UTC"): SundialDate {
-    return new SundialDate(wallToEpoch(parts, zone), zone);
+  static fromParts(parts: Parts, zone: Zone = "UTC"): JefflagDate {
+    return new JefflagDate(wallToEpoch(parts, zone), zone);
   }
 
-  static now(zone: Zone = "UTC"): SundialDate {
-    return new SundialDate(Date.now(), zone);
+  static now(zone: Zone = "UTC"): JefflagDate {
+    return new JefflagDate(Date.now(), zone);
   }
 
   get parts(): Parts {
@@ -112,11 +112,11 @@ export class SundialDate {
     return this.offsetMinutes > standard;
   }
 
-  withZone(zone: Zone): SundialDate {
-    return new SundialDate(this.epochMs, zone); // same instant, new wall clock
+  withZone(zone: Zone): JefflagDate {
+    return new JefflagDate(this.epochMs, zone); // same instant, new wall clock
   }
 
-  add(d: Duration): SundialDate {
+  add(d: Duration): JefflagDate {
     const p = this.parts;
     // Calendar units are applied in wall time (DST-aware); exact units are added to the epoch.
     const wall: Parts = {
@@ -131,16 +131,16 @@ export class SundialDate {
       (d.minutes ?? 0) * MS.minute +
       (d.seconds ?? 0) * MS.second +
       (d.milliseconds ?? 0);
-    return new SundialDate(epoch, this.zone);
+    return new JefflagDate(epoch, this.zone);
   }
 
-  subtract(d: Duration): SundialDate {
+  subtract(d: Duration): JefflagDate {
     const neg: Duration = {};
     for (const k of Object.keys(d) as (keyof Duration)[]) neg[k] = -(d[k] ?? 0);
     return this.add(neg);
   }
 
-  diff(other: SundialDate, unit: keyof typeof MS = "millisecond" as never): number {
+  diff(other: JefflagDate, unit: keyof typeof MS = "millisecond" as never): number {
     const delta = this.epochMs - other.epochMs;
     if (unit in MS) return delta / (MS as Record<string, number>)[unit];
     return delta;

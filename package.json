@@ -1,5 +1,5 @@
 {
-  "name": "sundial",
+  "name": "jefflag",
   "version": "3.4.1",
   "description": "Timezone-first date library that actually survives daylight saving.",
   "keywords": ["date", "time", "timezone", "dst", "datetime", "iso8601", "temporal"],
@@ -33,6 +33,6 @@
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fireship-dev/sundial.git"
+    "url": "git+https://github.com/fireship-dev/jefflag.git"
   }
 }

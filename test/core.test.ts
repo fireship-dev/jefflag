@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { SundialDate, parseISO, format } from "../src/index.js";
+import { JefflagDate, parseISO, format } from "../src/index.js";
 
 describe("timezone + DST", () => {
   it("keeps the instant when changing zones", () => {
@@ -16,7 +16,7 @@ describe("timezone + DST", () => {
 
   it("adds a day across the spring-forward transition", () => {
     // 2026-03-08 02:00 is the US DST gap. Adding a day should land on the same wall hour.
-    const before = SundialDate.fromParts(
+    const before = JefflagDate.fromParts(
       { year: 2026, month: 3, day: 7, hour: 12, minute: 0, second: 0, millisecond: 0 },
       "America/New_York",
     );

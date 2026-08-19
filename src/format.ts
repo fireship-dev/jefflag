@@ -1,4 +1,4 @@
-import { SundialDate } from "./core.js";
+import { JefflagDate } from "./core.js";
 
 const MONTHS = [
   "January", "February", "March", "April", "May", "June",
@@ -11,7 +11,7 @@ const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", 
  *   YYYY YY  MM MMM MMMM  DD ddd dddd  HH mm ss  A a  Z
  * Tokens can be escaped with square brackets, e.g. "[on] MMMM DD".
  */
-export function format(date: SundialDate, pattern: string): string {
+export function format(date: JefflagDate, pattern: string): string {
   const p = date.parts;
   const dow = new Date(date.epochMs).getUTCDay(); // weekday is offset-invariant here
   const h12 = p.hour % 12 === 0 ? 12 : p.hour % 12;
