@@ -1,0 +1,49 @@
+name: Jefflag triage
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+
+# One trigger per issue; don't cancel an in-flight call if the issue is edited.
+concurrency:
+  group: jefflag-triage-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify triage agent
+        env:
+          AGENT_URL: ${{ secrets.TRIAGE_AGENT_URL }}
+          AGENT_TOKEN: ${{ secrets.TRIAGE_AGENT_TOKEN }}
+          # Passed as env, never interpolated into the script body —
+          # issue fields are attacker-controlled on a public repo.
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          payload=$(jq -n \
+            --arg repo   "$REPO" \
+            --arg number "$ISSUE_NUMBER" \
+            --arg url    "$ISSUE_URL" \
+            --arg author "$ISSUE_AUTHOR" \
+            '{
+               event:        "issues.opened",
+               repo:         $repo,
+               issue_number: ($number | tonumber),
+               issue_url:    $url,
+               author:       $author
+             }')
+
+          curl --fail-with-body -sS --retry 3 --retry-connrefused \
+            -X POST "$AGENT_URL" \
+            -H "Authorization: Bearer $AGENT_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$payload"
