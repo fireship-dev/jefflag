@@ -1,4 +1,4 @@
-# ✈️⌚️ Jefflag
+# ✈️ Jefflag
 
 [![npm version](https://img.shields.io/badge/npm-v3.4.1-cb3837)](https://www.npmjs.com/package/jefflag)
 [![downloads](https://img.shields.io/badge/downloads-2.1M%2Fmonth-brightgreen)](https://www.npmjs.com/package/jefflag)
