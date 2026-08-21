@@ -9,7 +9,15 @@ const ISO =
  * as wall time in `zone`.
  */
 export function parseISO(input: string, zone: Zone = "UTC"): JefflagDate {
-  const m = ISO.exec(input.trim());
+  // Normalize date-only strings with offset (e.g. "2024-07-03+05:30" or
+  // "2024-07-03+0530") to include the implicit time component so the main
+  // regex matches. Accepts both extended and basic offset forms, matching
+  // what the ISO regex itself accepts.
+  const normalized = input.trim().replace(
+    /^(\d{4}-\d{2}-\d{2})([+-]\d{2}:?\d{2})$/,
+    "$1T00:00:00$2",
+  );
+  const m = ISO.exec(normalized);
   if (!m) {
     throw new RangeError(
       `Unrecognised ISO date: ${JSON.stringify(input)} (expected YYYY-MM-DD, optionally followed by THH:mm[:ss[.SSS]][Z|±HH:mm])`,

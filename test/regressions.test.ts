@@ -42,4 +42,18 @@ describe("regressions", () => {
   it("parseISO error message explains the accepted format", () => {
     expect(() => parseISO("15/06/2026")).toThrow(/expected YYYY-MM-DD/);
   });
+
+  it("parseISO accepts date-only strings with an extended offset", () => {
+    // "2024-07-03+05:30" means midnight local at +05:30 => 2024-07-02T18:30Z
+    const d = parseISO("2024-07-03+05:30");
+    expect(d.toISO()).toContain("2024-07-02");
+  });
+
+  it("parseISO accepts date-only strings with a basic (compact) offset", () => {
+    // ISO regex accepts +0530 as well as +05:30; the normalizer must too.
+    const d = parseISO("2024-07-03+0530");
+    expect(d.toISO()).toContain("2024-07-02");
+    const extended = parseISO("2024-07-03+05:30");
+    expect(d.epochMs).toBe(extended.epochMs);
+  });
 });
