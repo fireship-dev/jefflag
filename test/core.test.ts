@@ -3,7 +3,7 @@ import { JefflagDate, parseISO, format } from "../src/index.js";
 
 describe("timezone + DST", () => {
   it("keeps the instant when changing zones", () => {
-    const utc = parseISO("2026-03-08T12:00:00Z");
+    const utc = parseISO("2026-01-15T12:00:00Z");
     const ny = utc.withZone("America/New_York");
     expect(ny.epochMs).toBe(utc.epochMs);
     expect(ny.parts.hour).toBe(7); // EST, UTC-5
