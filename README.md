@@ -58,3 +58,7 @@ Jefflag is maintained by a very small, very tired team. If your issue is about *
 ## License
 
 MIT
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md). Bug fixes need a regression test.
