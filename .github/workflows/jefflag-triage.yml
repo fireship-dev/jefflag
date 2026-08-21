@@ -19,7 +19,7 @@ jobs:
       - name: Notify triage agent
         env:
           AGENT_URL: ${{ secrets.TRIAGE_AGENT_URL }}
-          AGENT_TOKEN: ${{ secrets.TRIAGE_AGENT_TOKEN }}
+          AGENT_SECRET: ${{ secrets.TRIAGE_AGENT_SECRET }}
           # Passed as env, never interpolated into the script body —
           # issue fields are attacker-controlled on a public repo.
           ISSUE_NUMBER: ${{ github.event.issue.number }}
@@ -44,6 +44,6 @@ jobs:
 
           curl --fail-with-body -sS --retry 3 --retry-connrefused \
             -X POST "$AGENT_URL" \
-            -H "Authorization: Bearer $AGENT_TOKEN" \
+            -H "X-Hyperagent-Webhook-Secret: $AGENT_SECRET" \
             -H "Content-Type: application/json" \
             -d "$payload"
