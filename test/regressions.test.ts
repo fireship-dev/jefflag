@@ -27,4 +27,15 @@ describe("regressions", () => {
   it("format survives pre-1970 instants", () => {
     expect(format(parseISO("1968-06-01T12:00:00Z"), "YYYY")).toBe("1968");
   });
+
+  it("format derives the weekday from the wall date, not the UTC epoch", () => {
+    // 2026-06-15 00:30 in Tokyo (+09:00) is 2026-06-14 15:30 UTC: the wall date
+    // is Monday 15th but the epoch falls on a Sunday. Weekday must follow the wall.
+    const d = JefflagDate.fromParts(
+      { year: 2026, month: 6, day: 15, hour: 0, minute: 30, second: 0, millisecond: 0 },
+      "Asia/Tokyo",
+    );
+    expect(format(d, "dddd")).toBe("Monday");
+    expect(format(d, "ddd")).toBe("Mon");
+  });
 });

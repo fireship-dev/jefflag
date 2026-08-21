@@ -13,7 +13,11 @@ const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", 
  */
 export function format(date: JefflagDate, pattern: string): string {
   const p = date.parts;
-  const dow = new Date(date.epochMs).getUTCDay(); // weekday is offset-invariant here
+  // Weekday must be derived from the *wall-clock* date, not the epoch: in zones
+  // east of UTC an instant near midnight belongs to a different UTC day than the
+  // one Intl reports for its wall clock, so getUTCDay() on the epoch returns the
+  // wrong day-of-week.
+  const dow = new Date(Date.UTC(p.year, p.month - 1, p.day)).getUTCDay();
   const h12 = p.hour % 12 === 0 ? 12 : p.hour % 12;
 
   const tokens: Record<string, string> = {
