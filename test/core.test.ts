@@ -31,4 +31,12 @@ describe("format", () => {
     const d = parseISO("2026-12-25T09:05:00Z");
     expect(format(d, "dddd, MMMM DD YYYY [at] HH:mm")).toBe("Friday, December 25 2026 at 09:05");
   });
+
+  it("UTC fast path agrees with the Intl path", () => {
+    const d = parseISO("2026-02-28T23:59:59.250Z");
+    expect(d.parts).toEqual(d.withZone("Etc/UTC").parts);
+    expect(d.parts.millisecond).toBe(250);
+    expect(d.offsetMinutes).toBe(0);
+    expect(d.withZone("GMT").offsetMinutes).toBe(0);
+  });
 });
