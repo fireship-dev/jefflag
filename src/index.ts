@@ -1,7 +1,8 @@
 export { JefflagDate } from "./core.js";
 export type { Parts, Duration, Zone } from "./core.js";
 export { wallToEpoch } from "./core.js";
-export { zoneOffset, clearZoneCache } from "./zone.js";
+export { zoneOffset, clearZoneCache, zoneCacheStats } from "./zone.js";
+export type { ZoneCacheStats } from "./zone.js";
 export { parseISO } from "./parse.js";
 export { format } from "./format.js";
 
