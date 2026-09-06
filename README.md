@@ -28,6 +28,21 @@ jefflag("2026-07-01T12:00:00Z")
   .toISO();                               // "2026-07-01T17:30:00+05:30"
 ```
 
+### Custom tokens
+
+Need a quarter, a day-of-year, a fiscal week? Register your own token. The
+resolver can be a function or, if your patterns live in a config file, a plain
+expression string over `p` (the wall-clock parts) and `date`:
+
+```ts
+import { registerToken, format } from "jefflag";
+
+registerToken("Q", "Math.ceil(p.month / 3)");
+registerToken("DOY", (p) => Math.floor((Date.UTC(p.year, p.month - 1, p.day) - Date.UTC(p.year, 0, 1)) / 864e5) + 1);
+
+format(t, "YYYY [Q]Q [day] DOY"); // "2026 Q1 day 67"
+```
+
 ## Why another date library
 
 Because the last one you used either mutated in place, shipped 70 kB of locale data, or quietly rounded your DST transition into the void. Jefflag does none of that.
