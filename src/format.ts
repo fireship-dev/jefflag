@@ -1,4 +1,4 @@
-import { JefflagDate } from "./core.js";
+import { JefflagDate, type Zone } from "./core.js";
 
 const MONTHS = [
   "January", "February", "March", "April", "May", "June",
@@ -51,4 +51,16 @@ function offsetLabel(min: number): string {
 
 function pad(n: number, len = 2): string {
   return String(n).padStart(len, "0");
+}
+
+/**
+ * Format `date` as it would read on a wall clock in `zone`, without changing the
+ * instant. Equivalent to `format(date.withZone(zone), pattern)` but avoids
+ * allocating an intermediate JefflagDate and reuses the cached formatter for
+ * `zone`, which matters when rendering the same instant in many zones (world
+ * clocks, meeting schedulers).
+ */
+export function formatInZone(date: JefflagDate, pattern: string, zone: Zone): string {
+  if (zone === date.zone) return format(date, pattern);
+  return format(date.withZone(zone), pattern);
 }
