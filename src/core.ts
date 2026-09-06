@@ -26,7 +26,27 @@ export interface Duration {
 
 const MS = { second: 1000, minute: 60_000, hour: 3_600_000, day: 86_400_000 };
 
+const UTC_ALIASES = new Set(["UTC", "Etc/UTC", "Etc/GMT", "GMT", "Z"]);
+
+/** True for zone ids that are always at offset zero, so Intl can be skipped entirely. */
+function isUTC(zone: Zone): boolean {
+  return UTC_ALIASES.has(zone);
+}
+
 function fmtParts(epochMs: number, zone: Zone): Parts {
+  if (isUTC(zone)) {
+    // Fast path: the JS Date UTC accessors already give us the wall clock.
+    const d = new Date(epochMs);
+    return {
+      year: d.getUTCFullYear(),
+      month: d.getUTCMonth() + 1,
+      day: d.getUTCDate(),
+      hour: d.getUTCHours(),
+      minute: d.getUTCMinutes(),
+      second: d.getUTCSeconds(),
+      millisecond: d.getUTCMilliseconds(),
+    };
+  }
   const dtf = new Intl.DateTimeFormat("en-US", {
     timeZone: zone,
     year: "numeric",
@@ -54,6 +74,7 @@ function fmtParts(epochMs: number, zone: Zone): Parts {
 
 // Offset (minutes) of a zone at a given instant, derived from the formatted wall time.
 export function zoneOffset(epochMs: number, zone: Zone): number {
+  if (isUTC(zone)) return 0;
   const p = fmtParts(epochMs, zone);
   const asUTC = Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second, p.millisecond);
   return Math.round((asUTC - epochMs) / MS.minute);
