@@ -3,6 +3,7 @@ export type { Parts, Duration, Zone } from "./core.js";
 export { zoneOffset, wallToEpoch } from "./core.js";
 export { parseISO } from "./parse.js";
 export { format } from "./format.js";
+export { isSameDay, isSameMonth, isToday } from "./compare.js";
 
 import { JefflagDate, type Zone } from "./core.js";
 import { parseISO } from "./parse.js";
