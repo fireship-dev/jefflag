@@ -50,6 +50,7 @@ Because the last one you used either mutated in place, shipped 70 kB of locale d
 | `.isDST()` / `.offsetMinutes` | Zone introspection. |
 | `.diff(other, unit)` | Difference in a given unit. |
 | `.toISO()` | Round-trippable ISO-8601 with offset. |
+| `isSameDay(a, b, zone?)` / `isSameMonth(a, b, zone?)` / `isToday(d)` | Wall-clock comparisons. |
 
 ## Status
 
