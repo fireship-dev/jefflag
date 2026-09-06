@@ -42,4 +42,10 @@ describe("regressions", () => {
   it("parseISO error message explains the accepted format", () => {
     expect(() => parseISO("15/06/2026")).toThrow(/expected YYYY-MM-DD/);
   });
+
+  it("parseISO does not throw on a leap second (#734)", () => {
+    expect(() => parseISO("2016-12-31T23:59:60Z")).not.toThrow();
+    expect(parseISO("2016-12-31T23:59:60Z").toISO()).toBe("2017-01-01T00:00:00Z");
+    expect(parseISO("2016-12-31T23:59:60+00:00").toISO()).toBe("2017-01-01T00:00:00Z");
+  });
 });
