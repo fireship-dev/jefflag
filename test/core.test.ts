@@ -1,5 +1,16 @@
 import { describe, it, expect } from "vitest";
 import { JefflagDate, parseISO, format } from "../src/index.js";
+import type { Parts } from "../src/index.js";
+
+const noon = (year: number, month: number, day: number): Parts => ({
+  year,
+  month,
+  day,
+  hour: 12,
+  minute: 0,
+  second: 0,
+  millisecond: 0,
+});
 
 describe("timezone + DST", () => {
   it("keeps the instant when changing zones", () => {
@@ -16,13 +27,20 @@ describe("timezone + DST", () => {
 
   it("adds a day across the spring-forward transition", () => {
     // 2026-03-08 02:00 is the US DST gap. Adding a day should land on the same wall hour.
-    const before = JefflagDate.fromParts(
-      { year: 2026, month: 3, day: 7, hour: 12, minute: 0, second: 0, millisecond: 0 },
-      "America/New_York",
-    );
+    const before = JefflagDate.fromParts(noon(2026, 3, 7), "America/New_York");
     const after = before.add({ days: 1 });
     expect(after.parts.hour).toBe(12);
     expect(after.parts.day).toBe(8);
+  });
+});
+
+describe("diff", () => {
+  it("defaults to milliseconds and accepts an explicit unit", () => {
+    const a = parseISO("2026-01-02T00:00:00Z");
+    const b = parseISO("2026-01-01T00:00:00Z");
+    expect(a.diff(b)).toBe(86_400_000);
+    expect(a.diff(b, "hour")).toBe(24);
+    expect(b.diff(a, "day")).toBe(-1);
   });
 });
 

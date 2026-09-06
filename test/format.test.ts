@@ -15,4 +15,8 @@ describe("format tokens", () => {
   it("escapes bracketed literals", () => {
     expect(format(parseISO("2026-06-15T00:00:00Z"), "[year] YYYY")).toBe("year 2026");
   });
+
+  it("passes unknown characters through untouched", () => {
+    expect(format(d, "YYYY/MM/DD - HH.mm")).toBe("2026/06/15 - 13.45");
+  });
 });

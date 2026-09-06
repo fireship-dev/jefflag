@@ -1,12 +1,18 @@
-import { JefflagDate, type Parts, type Zone } from "./core.js";
+import { JefflagDate } from "./core.js";
+import type { Parts, Zone } from "./core.js";
 
 const ISO =
   /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{1,3}))?)?(Z|[+-]\d{2}:?\d{2})?)?$/;
 
 /**
- * Parse an ISO-8601 string. If the string carries an offset it is honoured and
- * the result is expressed in `zone` (default UTC). Naive strings are interpreted
- * as wall time in `zone`.
+ * Parse an ISO-8601 string.
+ *
+ * If the string carries an offset it is honoured and the result is expressed in
+ * `zone` (default UTC). Naive strings are interpreted as wall time in `zone`.
+ *
+ * @param input - ISO-8601 date or date-time string.
+ * @param zone - IANA zone id for the result (default `"UTC"`).
+ * @throws {RangeError} If `input` is not a recognised ISO-8601 form.
  */
 export function parseISO(input: string, zone: Zone = "UTC"): JefflagDate {
   const m = ISO.exec(input.trim());
@@ -15,7 +21,7 @@ export function parseISO(input: string, zone: Zone = "UTC"): JefflagDate {
       `Unrecognised ISO date: ${JSON.stringify(input)} (expected YYYY-MM-DD, optionally followed by THH:mm[:ss[.SSS]][Z|±HH:mm])`,
     );
   }
-  const [, y, mo, d, h = "0", mi = "0", s = "0", ms = "0", off] = m;
+  const [, y = "0", mo = "1", d = "1", h = "0", mi = "0", s = "0", ms = "0", off] = m;
   const parts: Parts = {
     year: +y,
     month: +mo,
@@ -25,7 +31,7 @@ export function parseISO(input: string, zone: Zone = "UTC"): JefflagDate {
     second: +s,
     millisecond: +ms.padEnd(3, "0"),
   };
-  if (!off) return JefflagDate.fromParts(parts, zone);
+  if (off === undefined) return JefflagDate.fromParts(parts, zone);
 
   const offsetMin = off === "Z" ? 0 : offsetToMinutes(off);
   const utc =
@@ -34,8 +40,9 @@ export function parseISO(input: string, zone: Zone = "UTC"): JefflagDate {
   return JefflagDate.fromEpoch(utc, zone);
 }
 
+/** Convert `±HH:mm` / `±HHmm` to signed minutes. */
 function offsetToMinutes(off: string): number {
-  const sign = off[0] === "-" ? -1 : 1;
+  const sign = off.startsWith("-") ? -1 : 1;
   const clean = off.slice(1).replace(":", "");
   return sign * (Number(clean.slice(0, 2)) * 60 + Number(clean.slice(2)));
 }
