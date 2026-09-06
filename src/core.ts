@@ -116,6 +116,18 @@ export class JefflagDate {
     return new JefflagDate(this.epochMs, zone); // same instant, new wall clock
   }
 
+  /** Midnight at the start of this wall-clock day (DST-aware). */
+  startOfDay(): JefflagDate {
+    const p = this.parts;
+    return JefflagDate.fromParts({ ...p, hour: 0, minute: 0, second: 0, millisecond: 0 }, this.zone);
+  }
+
+  /** The last millisecond of this wall-clock day, i.e. 23:59:59.999 local. */
+  endOfDay(): JefflagDate {
+    const p = this.parts;
+    return JefflagDate.fromParts({ ...p, hour: 23, minute: 59, second: 59, millisecond: 999 }, this.zone);
+  }
+
   add(d: Duration): JefflagDate {
     const p = this.parts;
     // Calendar units are applied in wall time (DST-aware); exact units are added to the epoch.

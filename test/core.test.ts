@@ -31,4 +31,14 @@ describe("format", () => {
     const d = parseISO("2026-12-25T09:05:00Z");
     expect(format(d, "dddd, MMMM DD YYYY [at] HH:mm")).toBe("Friday, December 25 2026 at 09:05");
   });
+
+  it("startOfDay and endOfDay bracket the wall-clock day", () => {
+    const d = parseISO("2026-03-08T15:00:00", "America/New_York"); // DST starts this day
+    const start = d.startOfDay();
+    const end = d.endOfDay();
+    expect(start.parts).toMatchObject({ day: 8, hour: 0, minute: 0, second: 0, millisecond: 0 });
+    expect(end.parts).toMatchObject({ day: 8, hour: 23, minute: 59, second: 59, millisecond: 1000 });
+    // Spring-forward day is only 23 hours long.
+    expect(end.diff(start, "hour")).toBeCloseTo(23, 2);
+  });
 });
