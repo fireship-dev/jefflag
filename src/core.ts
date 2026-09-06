@@ -2,6 +2,8 @@
 // Everything is stored as UTC epoch milliseconds plus an IANA zone id;
 // all wall-clock math is resolved through Intl so DST is handled by the platform.
 
+import { wallParts, zoneOffset } from "./zone.js";
+
 export type Zone = string; // IANA id, e.g. "America/New_York", "Europe/Berlin", "UTC"
 
 export interface Parts {
@@ -26,38 +28,8 @@ export interface Duration {
 
 const MS = { second: 1000, minute: 60_000, hour: 3_600_000, day: 86_400_000 };
 
-function fmtParts(epochMs: number, zone: Zone): Parts {
-  const dtf = new Intl.DateTimeFormat("en-US", {
-    timeZone: zone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hourCycle: "h23",
-  });
-  const map: Record<string, number> = {};
-  for (const p of dtf.formatToParts(new Date(epochMs))) {
-    if (p.type !== "literal") map[p.type] = Number(p.value);
-  }
-  return {
-    year: map.year,
-    month: map.month,
-    day: map.day,
-    hour: map.hour === 24 ? 0 : map.hour,
-    minute: map.minute,
-    second: map.second,
-    millisecond: epochMs % 1000,
-  };
-}
-
-// Offset (minutes) of a zone at a given instant, derived from the formatted wall time.
-export function zoneOffset(epochMs: number, zone: Zone): number {
-  const p = fmtParts(epochMs, zone);
-  const asUTC = Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second, p.millisecond);
-  return Math.round((asUTC - epochMs) / MS.minute);
-}
+// All Intl access (and its caching) lives in zone.ts.
+export { zoneOffset } from "./zone.js";
 
 // Resolve a wall-clock time in a zone to an epoch. Handles the DST gap/overlap by
 // iterating the offset twice (the classic two-pass fixed-point used by temporal libs).
@@ -96,7 +68,7 @@ export class JefflagDate {
   }
 
   get parts(): Parts {
-    return fmtParts(this.epochMs, this.zone);
+    return wallParts(this.epochMs, this.zone);
   }
 
   get offsetMinutes(): number {
