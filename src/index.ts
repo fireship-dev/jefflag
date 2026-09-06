@@ -3,7 +3,7 @@ export type { Parts, Duration, Zone } from "./core.js";
 export { wallToEpoch } from "./core.js";
 export { zoneOffset, clearZoneCache } from "./zone.js";
 export { parseISO } from "./parse.js";
-export { format } from "./format.js";
+export { format, formatInZone } from "./format.js";
 
 import { JefflagDate, type Zone } from "./core.js";
 import { parseISO } from "./parse.js";
