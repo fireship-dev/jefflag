@@ -16,6 +16,24 @@ const OFFSET_CACHE_LIMIT = 4096;
 const formatters = new Map<Zone, Intl.DateTimeFormat>();
 const offsets = new Map<string, number>();
 
+let hits = 0;
+let misses = 0;
+let evictions = 0;
+
+/** Snapshot of the zone cache, for debugging and benchmarks. */
+export interface ZoneCacheStats {
+  /** Offset lookups served from the cache since the last reset. */
+  hits: number;
+  /** Offset lookups that had to go through Intl since the last reset. */
+  misses: number;
+  /** Number of times the offset cache was cleared because it hit its cap. */
+  evictions: number;
+  /** Cached offset buckets currently held. */
+  offsets: number;
+  /** Distinct zones with a memoised formatter. */
+  formatters: number;
+}
+
 /** Return the (cached) formatter used to resolve wall-clock parts in `zone`. */
 export function formatterFor(zone: Zone): Intl.DateTimeFormat {
   let dtf = formatters.get(zone);
@@ -70,16 +88,33 @@ export function zoneOffset(epochMs: number, zone: Zone): number {
   const bucket = Math.floor(epochMs / OFFSET_BUCKET_MS);
   const key = `${zone}|${bucket}`;
   const hit = offsets.get(key);
-  if (hit !== undefined) return hit;
+  if (hit !== undefined) {
+    hits++;
+    return hit;
+  }
 
-  if (offsets.size >= OFFSET_CACHE_LIMIT) offsets.clear();
+  misses++;
+  if (offsets.size >= OFFSET_CACHE_LIMIT) {
+    offsets.clear();
+    evictions++;
+  }
   const value = computeOffset(bucket * OFFSET_BUCKET_MS, zone);
   offsets.set(key, value);
   return value;
 }
 
-/** Drop every cached formatter and offset. Mostly useful in tests. */
+/**
+ * Inspect the zone cache. Handy for confirming that a hot loop is actually
+ * hitting the cache (a high miss ratio usually means many distinct zones, or
+ * instants spread over a very wide range).
+ */
+export function zoneCacheStats(): ZoneCacheStats {
+  return { hits, misses, evictions, offsets: offsets.size, formatters: formatters.size };
+}
+
+/** Drop every cached formatter and offset and reset counters. Mostly useful in tests. */
 export function clearZoneCache(): void {
   formatters.clear();
   offsets.clear();
+  hits = misses = evictions = 0;
 }

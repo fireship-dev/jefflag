@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { zoneOffset, clearZoneCache, parseISO } from "../src/index.js";
+import { zoneOffset, clearZoneCache, zoneCacheStats, parseISO } from "../src/index.js";
 
 describe("offset cache", () => {
   beforeEach(() => clearZoneCache());
@@ -32,5 +32,23 @@ describe("offset cache", () => {
 
   it("normalises negative epoch milliseconds", () => {
     expect(parseISO("1969-12-31T23:59:59.500Z").parts.millisecond).toBe(500);
+  });
+});
+
+describe("zoneCacheStats", () => {
+  beforeEach(() => clearZoneCache());
+
+  it("counts hits and misses", () => {
+    const t = Date.UTC(2026, 5, 1, 12);
+    zoneOffset(t, "Europe/Berlin");
+    zoneOffset(t, "Europe/Berlin");
+    zoneOffset(t + 60_000, "Europe/Berlin"); // same 15-minute bucket
+    expect(zoneCacheStats()).toMatchObject({ hits: 2, misses: 1, offsets: 1, formatters: 1 });
+  });
+
+  it("resets with clearZoneCache", () => {
+    zoneOffset(0, "UTC");
+    clearZoneCache();
+    expect(zoneCacheStats()).toEqual({ hits: 0, misses: 0, evictions: 0, offsets: 0, formatters: 0 });
   });
 });
