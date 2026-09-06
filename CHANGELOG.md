@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- perf: `Intl.DateTimeFormat` instances are memoised per zone and resolved
+  offsets are cached per 15-minute UTC bucket (`src/zone.ts`). Arithmetic on a
+  hot zone no longer constructs a formatter per call.
+- feat: `clearZoneCache()` is exported for tests and long-running processes
+  that want to drop the cache.
+- fix: `parts.millisecond` is no longer negative for pre-1970 instants.
 - fix: `format` derives the weekday from the wall-clock date instead of the UTC
   epoch, so `dddd`/`ddd` are correct for instants whose zone day differs from the
   epoch day (e.g. midnights east of UTC).
