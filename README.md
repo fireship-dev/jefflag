@@ -9,7 +9,7 @@
 
 **A timezone-first date library that actually survives daylight saving.**
 
-Jefflag stores every instant as UTC epoch + an IANA zone, and resolves all wall-clock math through the platform's `Intl` database, so spring-forward gaps and fall-back overlaps stop being your problem. Immutable, ~4 kB, zero dependencies.
+Jefflag stores every instant as UTC epoch + an IANA zone, and resolves all wall-clock math through the platform's `Intl` timezone database, so spring-forward gaps and fall-back overlaps stop being your problem. Immutable, ~4 kB, zero dependencies.
 
 ```bash
 npm install jefflag
@@ -41,7 +41,7 @@ Because the last one you used either mutated in place, shipped 70 kB of locale d
 
 | Function | Description |
 | --- | --- |
-| `jefflag(iso?, zone?)` | Now, or a parsed ISO string. |
+| `jefflag(iso?, zone?)` | The current instant, or a parsed ISO string. |
 | `parseISO(str, zone?)` | Parse ISO-8601; honours embedded offsets. |
 | `format(date, pattern)` | Token formatter (`YYYY MMMM DD HH:mm Z`, `[escapes]`). |
 | `JefflagDate.fromParts(parts, zone)` | Build from wall-clock parts. |
