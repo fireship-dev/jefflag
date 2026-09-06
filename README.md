@@ -50,6 +50,18 @@ Because the last one you used either mutated in place, shipped 70 kB of locale d
 | `.isDST()` / `.offsetMinutes` | Zone introspection. |
 | `.diff(other, unit)` | Difference in a given unit. |
 | `.toISO()` | Round-trippable ISO-8601 with offset. |
+| `zoneOffset(epochMs, zone)` | Offset in minutes of a zone at an instant (cached). |
+| `clearZoneCache()` | Drop cached formatters and offsets. |
+
+## Performance notes
+
+All timezone resolution goes through `Intl.DateTimeFormat`. Constructing one is
+the slow part (the engine loads the zone's transition table), so Jefflag keeps a
+single formatter per zone and caches resolved offsets per 15-minute UTC bucket.
+In practice this means a loop doing arithmetic on one zone touches `Intl` a
+handful of times, not once per operation. The cache is bounded and process-wide;
+call `clearZoneCache()` if you need to release it (for example between test
+files that assert on allocation counts).
 
 ## Status
 
