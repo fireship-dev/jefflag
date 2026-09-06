@@ -47,6 +47,7 @@ Because the last one you used either mutated in place, shipped 70 kB of locale d
 | `JefflagDate.fromParts(parts, zone)` | Build from wall-clock parts. |
 | `.add(d)` / `.subtract(d)` | DST-aware duration math. |
 | `.withZone(zone)` | Same instant, new wall clock. |
+| `.startOfDay()` / `.endOfDay()` | Bounds of the wall-clock day. |
 | `.isDST()` / `.offsetMinutes` | Zone introspection. |
 | `.diff(other, unit)` | Difference in a given unit. |
 | `.toISO()` | Round-trippable ISO-8601 with offset. |
