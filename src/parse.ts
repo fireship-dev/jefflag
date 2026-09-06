@@ -1,7 +1,10 @@
 import { JefflagDate, type Parts, type Zone } from "./core.js";
 
 const ISO =
-  /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{1,3}))?)?(Z|[+-]\d{2}:?\d{2})?)?$/;
+  /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::([0-5]\d|60)(?:\.(\d{1,3}))?)?(Z|[+-]\d{2}:?\d{2})?)?$/;
+
+/** Number of seconds in a positive leap second field ("23:59:60"). */
+const LEAP_SECOND = 60;
 
 /**
  * Parse an ISO-8601 string. If the string carries an offset it is honoured and
@@ -25,6 +28,13 @@ export function parseISO(input: string, zone: Zone = "UTC"): JefflagDate {
     second: +s,
     millisecond: +ms.padEnd(3, "0"),
   };
+  // A leap second (second === 60) cannot be represented on the JS epoch timeline.
+  // Normalise it by carrying into the next minute so the value is still a valid
+  // instant instead of throwing.
+  if (parts.second === LEAP_SECOND) {
+    parts.second = 0;
+    parts.minute += 1;
+  }
   if (!off) return JefflagDate.fromParts(parts, zone);
 
   const offsetMin = off === "Z" ? 0 : offsetToMinutes(off);
