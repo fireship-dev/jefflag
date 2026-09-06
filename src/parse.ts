@@ -10,7 +10,11 @@ const ISO =
  */
 export function parseISO(input: string, zone: Zone = "UTC"): JefflagDate {
   const m = ISO.exec(input.trim());
-  if (!m) throw new RangeError(`Unrecognised ISO date: ${JSON.stringify(input)}`);
+  if (!m) {
+    throw new RangeError(
+      `Unrecognised ISO date: ${JSON.stringify(input)} (expected YYYY-MM-DD, optionally followed by THH:mm[:ss[.SSS]][Z|±HH:mm])`,
+    );
+  }
   const [, y, mo, d, h = "0", mi = "0", s = "0", ms = "0", off] = m;
   const parts: Parts = {
     year: +y,

@@ -38,4 +38,8 @@ describe("regressions", () => {
     expect(format(d, "dddd")).toBe("Monday");
     expect(format(d, "ddd")).toBe("Mon");
   });
+
+  it("parseISO error message explains the accepted format", () => {
+    expect(() => parseISO("15/06/2026")).toThrow(/expected YYYY-MM-DD/);
+  });
 });
