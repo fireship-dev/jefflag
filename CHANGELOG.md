@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- refactor: enable `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`,
+  `verbatimModuleSyntax` and friends; JSDoc on every export; `diff()` now takes
+  a typed `DiffUnit` and `"millisecond"` is a real unit rather than a fallback.
 - fix: `parseISO` error message now spells out the accepted formats.
 - fix: `format` derives the weekday from the wall-clock date instead of the UTC
   epoch, so `dddd`/`ddd` are correct for instants whose zone day differs from the

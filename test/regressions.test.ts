@@ -1,14 +1,22 @@
 import { describe, it, expect } from "vitest";
 import { JefflagDate, parseISO, format } from "../src/index.js";
+import type { Parts } from "../src/index.js";
 
 // Each entry here corresponds to a fixed bug. Kept deliberately robust.
+const wall = (year: number, month: number, day: number, hour: number, minute: number): Parts => ({
+  year,
+  month,
+  day,
+  hour,
+  minute,
+  second: 0,
+  millisecond: 0,
+});
+
 describe("regressions", () => {
   it("adding a day across the NY spring-forward gap does not throw", () => {
     expect(() =>
-      JefflagDate.fromParts(
-        { year: 2026, month: 3, day: 7, hour: 1, minute: 30, second: 0, millisecond: 0 },
-        "America/New_York",
-      ).add({ days: 1 }),
+      JefflagDate.fromParts(wall(2026, 3, 7, 1, 30), "America/New_York").add({ days: 1 }),
     ).not.toThrow();
   });
 
@@ -31,10 +39,7 @@ describe("regressions", () => {
   it("format derives the weekday from the wall date, not the UTC epoch", () => {
     // 2026-06-15 00:30 in Tokyo (+09:00) is 2026-06-14 15:30 UTC: the wall date
     // is Monday 15th but the epoch falls on a Sunday. Weekday must follow the wall.
-    const d = JefflagDate.fromParts(
-      { year: 2026, month: 6, day: 15, hour: 0, minute: 30, second: 0, millisecond: 0 },
-      "Asia/Tokyo",
-    );
+    const d = JefflagDate.fromParts(wall(2026, 6, 15, 0, 30), "Asia/Tokyo");
     expect(format(d, "dddd")).toBe("Monday");
     expect(format(d, "ddd")).toBe("Mon");
   });
