@@ -15,15 +15,20 @@ export function parseISO(input: string, zone: Zone = "UTC"): JefflagDate {
       `Unrecognised ISO date: ${JSON.stringify(input)} (expected YYYY-MM-DD, optionally followed by THH:mm[:ss[.SSS]][Z|±HH:mm])`,
     );
   }
+  if (Number(m[6]) > 60) throw new RangeError(`Invalid seconds in ISO date: ${JSON.stringify(input)}`);
   const [, y, mo, d, h = "0", mi = "0", s = "0", ms = "0", off] = m;
+  // ISO-8601 allows ":60" for a positive leap second. JavaScript's epoch has no
+  // representation for it, so we clamp to the last representable instant of the
+  // minute (23:59:59.999), which is what most libraries and POSIX clocks do.
+  const leap = s === "60";
   const parts: Parts = {
     year: +y,
     month: +mo,
     day: +d,
     hour: +h,
     minute: +mi,
-    second: +s,
-    millisecond: +ms.padEnd(3, "0"),
+    second: leap ? 59 : +s,
+    millisecond: leap ? 999 : +ms.padEnd(3, "0"),
   };
   if (!off) return JefflagDate.fromParts(parts, zone);
 
