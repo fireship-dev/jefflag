@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- feat: `parseISO` throws `JefflagParseError` (a `RangeError` subclass) carrying the offending `input`.
 - fix: `format` derives the weekday from the wall-clock date instead of the UTC
   epoch, so `dddd`/`ddd` are correct for instants whose zone day differs from the
   epoch day (e.g. midnights east of UTC).

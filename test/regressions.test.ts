@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { JefflagDate, parseISO, format } from "../src/index.js";
+import { JefflagDate, JefflagParseError, parseISO, format } from "../src/index.js";
 
 // Each entry here corresponds to a fixed bug. Kept deliberately robust.
 describe("regressions", () => {
@@ -37,5 +37,16 @@ describe("regressions", () => {
     );
     expect(format(d, "dddd")).toBe("Monday");
     expect(format(d, "ddd")).toBe("Mon");
+  });
+
+  it("parseISO throws a typed error that is still a RangeError", () => {
+    try {
+      parseISO("not a date");
+      expect.unreachable();
+    } catch (e) {
+      expect(e).toBeInstanceOf(JefflagParseError);
+      expect(e).toBeInstanceOf(RangeError);
+      expect((e as JefflagParseError).input).toBe("not a date");
+    }
   });
 });
