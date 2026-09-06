@@ -1,5 +1,19 @@
 import { JefflagDate, type Parts, type Zone } from "./core.js";
 
+/**
+ * Thrown by `parseISO` when the input is not a recognised ISO-8601 string.
+ * Extends `RangeError` so existing `catch (e instanceof RangeError)` code keeps working.
+ */
+export class JefflagParseError extends RangeError {
+  readonly input: string;
+
+  constructor(input: string) {
+    super(`Unrecognised ISO date: ${JSON.stringify(input)}`);
+    this.name = "JefflagParseError";
+    this.input = input;
+  }
+}
+
 const ISO =
   /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{1,3}))?)?(Z|[+-]\d{2}:?\d{2})?)?$/;
 
@@ -10,7 +24,7 @@ const ISO =
  */
 export function parseISO(input: string, zone: Zone = "UTC"): JefflagDate {
   const m = ISO.exec(input.trim());
-  if (!m) throw new RangeError(`Unrecognised ISO date: ${JSON.stringify(input)}`);
+  if (!m) throw new JefflagParseError(input);
   const [, y, mo, d, h = "0", mi = "0", s = "0", ms = "0", off] = m;
   const parts: Parts = {
     year: +y,
