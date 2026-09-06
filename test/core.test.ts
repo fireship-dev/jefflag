@@ -37,11 +37,14 @@ describe("issue #437: DST wall-time preservation", () => {
     const result = t.add({ days: 1 });
     expect(result.parts.hour).toBe(1);
     expect(result.parts.minute).toBe(30);
+    expect(result.parts.second).toBe(0);
+    expect(result.parts.year).toBe(2026);
+    expect(result.parts.month).toBe(3);
     expect(result.parts.day).toBe(9);
   });
 
-  it("preserves wall hour across Asia/Kolkata spring-forward", () => {
-    // Input: 2026-03-08 01:30 IST
+  it("preserves wall time in Asia/Kolkata (non-DST control)", () => {
+    // Input: 2026-03-08 01:30 IST in a non-DST zone
     // Expected: 2026-03-09 01:30 IST, same wall time
     const t = JefflagDate.fromParts(
       { year: 2026, month: 3, day: 8, hour: 1, minute: 30, second: 0, millisecond: 0 },
@@ -50,6 +53,9 @@ describe("issue #437: DST wall-time preservation", () => {
     const result = t.add({ days: 1 });
     expect(result.parts.hour).toBe(1);
     expect(result.parts.minute).toBe(30);
+    expect(result.parts.second).toBe(0);
+    expect(result.parts.year).toBe(2026);
+    expect(result.parts.month).toBe(3);
     expect(result.parts.day).toBe(9);
   });
 });
