@@ -41,14 +41,29 @@ function fmtParts(epochMs: number, zone: Zone): Parts {
   for (const p of dtf.formatToParts(new Date(epochMs))) {
     if (p.type !== "literal") map[p.type] = Number(p.value);
   }
+  // Intl may report hour 24 for end-of-day; that is the next calendar day 00:00.
+  // Only zeroing the hour without advancing the date caused off-by-one near midnight.
+  let year = map.year;
+  let month = map.month;
+  let day = map.day;
+  let hour = map.hour;
+  if (hour === 24) {
+    const next = new Date(0);
+    next.setUTCFullYear(year, month - 1, day + 1);
+    year = next.getUTCFullYear();
+    month = next.getUTCMonth() + 1;
+    day = next.getUTCDate();
+    hour = 0;
+  }
   return {
-    year: map.year,
-    month: map.month,
-    day: map.day,
-    hour: map.hour === 24 ? 0 : map.hour,
+    year,
+    month,
+    day,
+    hour,
     minute: map.minute,
     second: map.second,
-    millisecond: epochMs % 1000,
+    // Positive remainder so negative epochs near epoch origin stay in [0,999].
+    millisecond: ((epochMs % 1000) + 1000) % 1000,
   };
 }
 
