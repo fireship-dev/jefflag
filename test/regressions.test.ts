@@ -46,7 +46,7 @@ describe("regressions", () => {
   it("parseISO accepts date-only strings with an extended offset", () => {
     // "2024-07-03+05:30" means midnight local at +05:30 => 2024-07-02T18:30Z
     const d = parseISO("2024-07-03+05:30");
-    expect(d.toISO()).toContain("2024-07-02");
+    expect(d.epochMs).toBe(Date.UTC(2024, 6, 2, 18, 30));
   });
 
   it("parseISO accepts date-only strings with a basic (compact) offset", () => {
